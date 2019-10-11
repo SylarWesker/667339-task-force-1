@@ -1,7 +1,7 @@
 # Личный проект «TaskForce»
 
 * Студент: [Сергей Жиров](https://up.htmlacademy.ru/yii/1/user/667339).
-* Наставник: `Неизвестно`.
+* Наставник: `Денис Байдаров(https://htmlacademy.ru/profile/4er)`.
 
 ---
 
