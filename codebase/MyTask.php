@@ -1,6 +1,6 @@
 <?php
 
-namespace htmlacademy\taskforce;
+namespace TaskForce\Codebase;
 
 class Actions
 {
