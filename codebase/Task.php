@@ -1,7 +1,6 @@
 <?php
 
-// В этом файле попробую реализовать класс как написано в задании.
-namespace htmlacademy\taskforce;
+namespace TaskForce\Codebase;
 
 class Task
 {
@@ -9,6 +8,22 @@ class Task
     protected $id_performer;    // id исполнителя.
     protected $finish_date;     // срок завершения.
     protected $status;          // текущий статус.
+
+    // Геттеры.
+    public function getIdClient()
+    {
+        return $this->id_client;
+    }
+
+    public function getIdPerformer()
+    {
+        return $this->id_performer;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
     // Статусы.
     const STATUS_NEW        = 'new';         // Новое задание (создано Заказчиком)
@@ -24,8 +39,12 @@ class Task
     const ACTION_COMPLETE   = 'complete';   // Выполнено (Заказчик)
     const ACTION_APPOINT    = 'appoint';    // Назначить исполнителя (Заказчик)
 
+    // ToDo
     // а как же дата завершения? логичнее передавать id заказчика и дату завершения, а id исполнителя потом установить когда он станет известен.
     public function __construct($id_client, $id_performer) {
+        // ToDo
+        // По идее id клиента не может быть равно id исполнителя.
+        // Но кидать исключение в конструкторе вроде плохой тон.
         $this->id_client = $id_client;
         $this->id_performer = $id_performer;
 
@@ -107,11 +126,11 @@ class Task
 
         switch ($status) {
             case self::STATUS_NEW: {
-                $availableActions = [ self::STATUS_CANCELED, self::ACTION_RESPOND ,self::ACTION_APPOINT ];
+                $availableActions = [ self::ACTION_CANCEL, self::ACTION_RESPOND, self::ACTION_APPOINT ];
                 break;
             }
             case self::STATUS_WORKED: {
-                $availableActions = [ self::STATUS_FAILED, self::STATUS_COMPLETED ];
+                $availableActions = [ self::ACTION_REFUSE, self::ACTION_COMPLETE ];
                 break;
             }
             case self::STATUS_COMPLETED:
@@ -125,4 +144,3 @@ class Task
         return $availableActions;
     }
 }
-
