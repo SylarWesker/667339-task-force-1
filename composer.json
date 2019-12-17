@@ -1,0 +1,12 @@
+{
+  "autoload": {
+    "psr-4": {
+      "TaskForce\\Codebase\\": "codebase"
+    }
+  },
+  "require": {
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8"
+  }
+}
