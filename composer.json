@@ -1,7 +1,8 @@
 {
   "autoload": {
     "psr-4": {
-      "TaskForce\\Codebase\\": "codebase"
+      "TaskForce\\": "src",
+      "TaskForce\\Logic\\": "src/logic"
     }
   },
   "require": {
