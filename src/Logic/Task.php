@@ -4,7 +4,7 @@ namespace TaskForce\Logic;
 
 /**
  * Class Task - класс задачи
- * @package TaskForce\Codebase
+ * @package TaskForce\Logic
  */
 class Task
 {

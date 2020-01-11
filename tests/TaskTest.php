@@ -8,7 +8,7 @@ use TaskForce\Logic\Task;
 final class TaskTest extends TestCase
 {
     protected $task;
-    private $className = 'TaskForce\Logic\Task';
+    private $className = Task::class;
 
     protected function setUp(): void
     {
