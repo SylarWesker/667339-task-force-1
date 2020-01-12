@@ -3,11 +3,12 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PHPUnit\Framework\TestCase;
-use TaskForce\Codebase\Task;
+use TaskForce\Logic\Task;
 
 final class TaskTest extends TestCase
 {
     protected $task;
+    private $className = Task::class;
 
     protected function setUp(): void
     {
@@ -30,7 +31,7 @@ final class TaskTest extends TestCase
     {
         // Т.к следующий статус зависит и от дейтсвия и от текущего статуса, то нужен способ задать статус.
         // Пока не реализована смена статусов. Поэтому приходится менять через рефлексию.
-        $reflector = new ReflectionClass('TaskForce\Codebase\Task');
+        $reflector = new ReflectionClass($this->className);
         $property = $reflector->getProperty('status');
         $property->setAccessible(true);
 
@@ -49,7 +50,7 @@ final class TaskTest extends TestCase
     {
         // Т.к следующий статус зависит и от дейтсвия и от текущего статуса, то нужен способ задать статус.
         // Пока не реализована смена статусов. Поэтому приходится менять через рефлексию.
-        $reflector = new ReflectionClass('TaskForce\Codebase\Task');
+        $reflector = new ReflectionClass($this->className);
         $property = $reflector->getProperty('status');
         $property->setAccessible(true);
 
@@ -66,7 +67,7 @@ final class TaskTest extends TestCase
     {
         // Т.к следующий статус зависит и от дейтсвия и от текущего статуса, то нужен способ задать статус.
         // Пока не реализована смена статусов. Поэтому приходится менять через рефлексию.
-        $reflector = new ReflectionClass('TaskForce\Codebase\Task');
+        $reflector = new ReflectionClass($this->className);
         $property = $reflector->getProperty('status');
         $property->setAccessible(true);
 
@@ -83,7 +84,7 @@ final class TaskTest extends TestCase
     {
         // Т.к следующий статус зависит и от дейтсвия и от текущего статуса, то нужен способ задать статус.
         // Пока не реализована смена статусов. Поэтому приходится менять через рефлексию.
-        $reflector = new ReflectionClass('TaskForce\Codebase\Task');
+        $reflector = new ReflectionClass($this->className);
         $property = $reflector->getProperty('status');
         $property->setAccessible(true);
 

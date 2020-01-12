@@ -1,10 +1,10 @@
 <?php
 
-namespace TaskForce\Codebase;
+namespace TaskForce\Logic;
 
 /**
  * Class Task - класс задачи
- * @package TaskForce\Codebase
+ * @package TaskForce\Logic
  */
 class Task
 {
@@ -32,6 +32,12 @@ class Task
     /** @var string $status - текущий статус задачи */
     protected $status = self::STATUS_NEW;
 
+    public function __construct($id_client, $id_performer)
+    {
+        $this->client_id = $id_client;
+        $this->performer_id = $id_performer;
+    }
+
     public function getClientId()
     {
         return $this->client_id;
@@ -42,30 +48,27 @@ class Task
         return $this->performer_id;
     }
 
+    // ToDo
+    // а как же дата завершения? логичнее передавать id заказчика и дату завершения, а id исполнителя потом установить когда он станет известен.
+
     public function getStatus()
     {
         return $this->status;
     }
 
-    // ToDo
-    // а как же дата завершения? логичнее передавать id заказчика и дату завершения, а id исполнителя потом установить когда он станет известен.
-    public function __construct($id_client, $id_performer)
+    public function getStatusList()
     {
-        $this->client_id = $id_client;
-        $this->performer_id = $id_performer;
-    }
-
-    public function getStatusList() {
         return [
-            self::STATUS_NEW        => 'новое',
-            self::STATUS_CANCELED   => 'отменено',
-            self::STATUS_WORKED     => 'в работе',
-            self::STATUS_COMPLETED  => 'завершено',
-            self::STATUS_FAILED     => 'провалено',
+            self::STATUS_NEW => 'новое',
+            self::STATUS_CANCELED => 'отменено',
+            self::STATUS_WORKED => 'в работе',
+            self::STATUS_COMPLETED => 'завершено',
+            self::STATUS_FAILED => 'провалено',
         ];
     }
 
-    public function getActionList() {
+    public function getActionList()
+    {
         return [
             self::ACTION_CANCEL => 'отменить',
             self::ACTION_RESPOND => 'откликнуться',
@@ -93,19 +96,22 @@ class Task
                 }
                 break;
             }
-            case self::ACTION_REFUSE: {
+            case self::ACTION_REFUSE:
+            {
                 if ($this->status == self::STATUS_WORKED) {
                     $nextStatus = self::STATUS_FAILED;
                 }
                 break;
             }
-            case self::ACTION_APPOINT: {
+            case self::ACTION_APPOINT:
+            {
                 if ($this->status == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_WORKED;
                 }
                 break;
             }
-            case self::ACTION_COMPLETE: {
+            case self::ACTION_COMPLETE:
+            {
                 if ($this->status == self::STATUS_WORKED) {
                     $nextStatus = self::STATUS_COMPLETED;
                 }
