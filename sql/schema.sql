@@ -14,11 +14,13 @@ CREATE TABLE IF NOT EXISTS `Task`
     `status_id`     int,
     `category_id`   int          NOT NULL,
     `description`   varchar(255) NOT NULL,
-    `details`       text         NOT NULL, -- ToDo или varchar будет достаточно?
-    `cost`          int,                   -- бюджет задачи
+    `details`       text         NOT NULL,
+    `cost`          int,          -- бюджет задачи
     `creation_date` datetime,
-    `latitude`      varchar(255),          -- ToDo: Или использовать не строки, а числа (отдельно для градусов и минут?)
-    `longitude`     varchar(255),          --
+
+    -- геоданные
+    `latitude`      varchar(255), -- ToDo: Или использовать не строки, а числа (отдельно для градусов и минут?)
+    `longitude`     varchar(255), --
     `locality_id`   int
 );
 
@@ -37,30 +39,34 @@ CREATE TABLE IF NOT EXISTS `TaskRelatedFile`
     `filepath` varchar(255) NOT NULL
 );
 
--- ToDo: Не склишком ли много данных в таблице с пользователем?
--- Хочется завести еще таблицу/сущность - профиль, но в текущем варианте не имеет смысла. Т.к у одного пользователя - один профиль
 CREATE TABLE IF NOT EXISTS `User`
 (
+    `id`          int PRIMARY KEY AUTO_INCREMENT,
+    `email`       varchar(255) UNIQUE NOT NULL,
+    `password`    varchar(255)        NOT NULL,
+    `full_name`   varchar(255)        NOT NULL,
+
+    -- геоданные
+    `latitude`    varchar(255),
+    `longitude`   varchar(255),
+    `locality_id` int
+);
+
+CREATE TABLE `Profile`
+(
     `id`                           int PRIMARY KEY AUTO_INCREMENT,
-    `email`                        varchar(255) UNIQUE NOT NULL,
-    `password`                     varchar(255)        NOT NULL,
-    `full_name`                    varchar(255)        NOT NULL,
+    `user_id`                      int,
     `avatar_filepath`              varchar(255),
     `birthday`                     date,
-    `about`                        varchar(255), -- о себе
+    `about`                        varchar(255),
     `phone`                        varchar(255),
     `skype`                        varchar(255),
     `another_messenger`            varchar(255),
-
-    `latitude`                     varchar(255),
-    `longitude`                    varchar(255),
-    `locality_id`                  int,
-
-    -- Настройки уведомлений
+    `view_count`                   int DEFAULT 0,
+    `last_activity_date`           datetime,
     `new_message_notification`     bool,
     `new_response_notification`    bool,
     `new_task_action_notification` bool,
-
     `show_contacts_only_to_client` bool,
     `hide_profile`                 bool
 );
@@ -94,8 +100,6 @@ CREATE TABLE IF NOT EXISTS `Locality`
     `name` varchar(255) NOT NULL
 );
 
--- ToDo
--- Сделать ограничение на уникальность пары id претендента и id задания? (дважды откликаться на одно и тоже задание)
 -- Отклик
 CREATE TABLE IF NOT EXISTS `Response`
 (
@@ -108,11 +112,10 @@ CREATE TABLE IF NOT EXISTS `Response`
 -- Отзыв
 CREATE TABLE IF NOT EXISTS `Review`
 (
-    `id`          int PRIMARY KEY AUTO_INCREMENT,
-    `task_id`     int NOT NULL,
-    `is_finished` bool, -- true - если все хорошо, false - если были проблемы. ToDo: хотя можно смотреть по статусу самой задачи...
-    `rate`        int,  -- ToDo: оценка. Просто число или должна быть отдельная таблица с возможными оценками?
-    `comment`     varchar(255)
+    `id`      int PRIMARY KEY AUTO_INCREMENT,
+    `task_id` int NOT NULL,
+    `rate`    int,
+    `comment` varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS `Message`
@@ -120,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `Message`
     `id`          int PRIMARY KEY AUTO_INCREMENT,
     `sender_id`   int NOT NULL,
     `receiver_id` int NOT NULL,
-    `task_id`     int NOT NULL, -- ToDo: переписка разбивается на части (отдельно для каждого задания)?
+    `task_id`     int NOT NULL,
     `send_date`   datetime
 );
 
@@ -155,16 +158,21 @@ ALTER TABLE `UserSpecialization`
 ALTER TABLE `UserSpecialization`
     ADD FOREIGN KEY (`category_id`) REFERENCES `Category` (`id`);
 
-ALTER TABLE `UserPortfolio`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `User` (`id`);
-
 ALTER TABLE `User`
     ADD FOREIGN KEY (`locality_id`) REFERENCES `Locality` (`id`);
+
+ALTER TABLE `Profile`
+    ADD FOREIGN KEY (`user_id`) REFERENCES `User` (`id`);
+
+ALTER TABLE `UserPortfolio`
+    ADD FOREIGN KEY (`user_id`) REFERENCES `User` (`id`);
 
 ALTER TABLE `Response`
     ADD FOREIGN KEY (`candidate_id`) REFERENCES `User` (`id`);
 ALTER TABLE `Response`
     ADD FOREIGN KEY (`task_id`) REFERENCES `Task` (`id`);
+ALTER TABLE `Response`
+    ADD CONSTRAINT unique_response_on_task UNIQUE KEY (`task_id`, `candidate_id`);
 
 ALTER TABLE `Message`
     ADD FOREIGN KEY (`sender_id`) REFERENCES `User` (`id`);
