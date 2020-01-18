@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS `Task`
     `creation_date` datetime,
 
     -- геоданные
-    `latitude`      varchar(255), -- ToDo: Или использовать не строки, а числа (отдельно для градусов и минут?)
-    `longitude`     varchar(255), --
+    `latitude`      int,
+    `longitude`     int,
     `locality_id`   int
 );
 
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS `User`
     `full_name`   varchar(255)        NOT NULL,
 
     -- геоданные
-    `latitude`    varchar(255),
-    `longitude`   varchar(255),
+    `latitude`    int,
+    `longitude`   int,
     `locality_id` int
 );
 
