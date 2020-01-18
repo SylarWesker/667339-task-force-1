@@ -15,12 +15,12 @@ CREATE TABLE IF NOT EXISTS `Task`
     `category_id`   int          NOT NULL,
     `description`   varchar(255) NOT NULL,
     `details`       text         NOT NULL,
-    `cost`          int,          -- бюджет задачи
+    `cost`          int, -- бюджет задачи
     `creation_date` datetime,
 
     -- геоданные
-    `latitude`      int,
-    `longitude`     int,
+    `latitude`      decimal(8, 6),
+    `longitude`     decimal(8, 6),
     `locality_id`   int
 );
 
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS `User`
     `full_name`   varchar(255)        NOT NULL,
 
     -- геоданные
-    `latitude`    int,
-    `longitude`   int,
+    `latitude`    decimal(8, 6),
+    `longitude`   decimal(8, 6),
     `locality_id` int
 );
 
