@@ -32,6 +32,8 @@ class Task
     /** @var string $status - текущий статус задачи */
     protected $status = self::STATUS_NEW;
 
+    // ToDo
+    // а как же дата завершения? логичнее передавать id заказчика и дату завершения, а id исполнителя потом установить когда он станет известен.
     public function __construct($id_client, $id_performer)
     {
         $this->client_id = $id_client;
@@ -47,9 +49,6 @@ class Task
     {
         return $this->performer_id;
     }
-
-    // ToDo
-    // а как же дата завершения? логичнее передавать id заказчика и дату завершения, а id исполнителя потом установить когда он станет известен.
 
     public function getStatus()
     {
@@ -76,6 +75,14 @@ class Task
             self::ACTION_COMPLETE => 'выполнено',
             self::ACTION_APPOINT => 'назначить исполнителя',
         ];
+
+        /*return [
+            new CancelAction(),
+            new RespondAction(),
+            new RefuseAction(),
+            new CompleteAction(),
+            new AppointAction(),
+        ];*/
     }
 
     // ToDo
@@ -122,25 +129,37 @@ class Task
         return $nextStatus;
     }
 
-    // ToDo
-    // Список действий также зависит от роли...
     /**
+     * Возвращает список, возможных действий для задачи.
      * @param $status - статус задачи
+     * @param int $user_id - id пользователя
      * @return array список возможных действий для указанного статуса.
      */
-    public function getActions($status)
+    public function getActions($status, $user_id)
     {
         switch ($status) {
             case self::STATUS_NEW:
             {
-                return [self::ACTION_CANCEL, self::ACTION_RESPOND, self::ACTION_APPOINT];
+                $actions = [new CancelAction(), new RespondAction(), new AppointAction()];
+                break;
             }
             case self::STATUS_WORKED:
             {
-                return [self::ACTION_REFUSE, self::ACTION_COMPLETE];
+                $actions = [new RefuseAction(), new CompleteAction()];
+                break;
+            }
+            default:
+            {
+                $actions = [];
             }
         }
 
-        return [];
+        if (!empty($actions)) {
+            $actions = array_filter($actions, function ($x) use ($user_id) {
+                return $x->canExecute($user_id, $this->client_id, $this->performer_id);
+            });
+        }
+
+        return $actions;
     }
 }

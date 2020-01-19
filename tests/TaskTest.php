@@ -3,16 +3,27 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PHPUnit\Framework\TestCase;
+
 use TaskForce\Logic\Task;
+use TaskForce\Logic\CancelAction;
+use TaskForce\Logic\AppointAction;
+use TaskForce\Logic\RespondAction;
+use TaskForce\Logic\CompleteAction;
+use TaskForce\Logic\RefuseAction;
 
 final class TaskTest extends TestCase
 {
-    protected $task;
     private $className = Task::class;
+
+    protected $task;
+    protected $id_client;
+    protected $id_performer;
 
     protected function setUp(): void
     {
-        $this->task = new Task(1,2);
+        $this->id_client = 1;
+        $this->id_performer = 2;
+        $this->task = new Task($this->id_client, $this->id_performer);
     }
 
     public function testGetNextStatusWithStatusNew()
@@ -97,20 +108,37 @@ final class TaskTest extends TestCase
         $this->assertTrue($this->task->getNextStatus(Task::ACTION_COMPLETE) == Task::STATUS_CANCELED);
     }
 
-    public function testGetActionsWithNewStatus()
+    public function testGetActionsWithNewStatusToClient()
     {
-        $this->assertEquals($this->task->getActions(Task::STATUS_NEW), [ Task::ACTION_CANCEL, Task::ACTION_RESPOND, Task::ACTION_APPOINT]);
+        $this->assertEqualsCanonicalizing($this->task->getActions(Task::STATUS_NEW, $this->id_client), [new CancelAction(), new AppointAction()]);
     }
 
-    public function testGetActionsWithWorkedStatus()
+    public function testGetActionsWithNewStatusToPerformer()
     {
-        $this->assertEquals($this->task->getActions(Task::STATUS_WORKED), [ Task::ACTION_REFUSE, Task::ACTION_COMPLETE ]);
+        $this->assertEqualsCanonicalizing($this->task->getActions(Task::STATUS_NEW, $this->id_performer), [new RespondAction()]);
     }
 
-    public function testGetActionsWithOtherStatus()
+    public function testGetActionsWithWorkedStatusToClient()
     {
-        $this->assertEquals($this->task->getActions(Task::ACTION_CANCEL), [ ]);
-        $this->assertEquals($this->task->getActions(Task::ACTION_REFUSE), [ ]);
-        $this->assertEquals($this->task->getActions(Task::ACTION_COMPLETE), [ ]);
+        $this->assertEqualsCanonicalizing($this->task->getActions(Task::STATUS_WORKED, $this->id_client), [new CompleteAction()]);
+    }
+
+    public function testGetActionsWithWorkedStatusToPerformer()
+    {
+        $this->assertEqualsCanonicalizing($this->task->getActions(Task::STATUS_WORKED, $this->id_performer), [new RefuseAction()]);
+    }
+
+    public function testGetActionsWithOtherStatusToClient()
+    {
+        $this->assertEquals($this->task->getActions(Task::STATUS_CANCELED, $this->id_client), []);
+        $this->assertEquals($this->task->getActions(Task::STATUS_FAILED, $this->id_client), []);
+        $this->assertEquals($this->task->getActions(Task::STATUS_COMPLETED, $this->id_client), []);
+    }
+
+    public function testGetActionsWithOtherStatusToPerformer()
+    {
+        $this->assertEquals($this->task->getActions(Task::STATUS_CANCELED, $this->id_performer), []);
+        $this->assertEquals($this->task->getActions(Task::STATUS_FAILED, $this->id_performer), []);
+        $this->assertEquals($this->task->getActions(Task::STATUS_COMPLETED, $this->id_performer), []);
     }
 }
