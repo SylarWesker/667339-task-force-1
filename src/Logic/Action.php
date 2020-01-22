@@ -7,7 +7,7 @@ abstract class Action
     // Возвращает название действия.
     public static abstract function getName();
 
-    // Вовзращает внутренее имя.
+    // Возвращает внутренее имя.
     public static abstract function getTitle();
 
     /**

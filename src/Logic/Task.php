@@ -14,12 +14,6 @@ class Task
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_FAILED = 'failed';
 
-    public const ACTION_CANCEL = 'cancel';
-    public const ACTION_RESPOND = 'respond';
-    public const ACTION_REFUSE = 'refuse';
-    public const ACTION_COMPLETE = 'complete';
-    public const ACTION_APPOINT = 'appoint';
-
     /** @var int $client_id - id заказчика */
     protected $client_id;
 
@@ -69,55 +63,51 @@ class Task
     public function getActionList()
     {
         return [
-            self::ACTION_CANCEL => 'отменить',
-            self::ACTION_RESPOND => 'откликнуться',
-            self::ACTION_REFUSE => 'отказаться',
-            self::ACTION_COMPLETE => 'выполнено',
-            self::ACTION_APPOINT => 'назначить исполнителя',
+            CancelAction::getTitle() => CancelAction::getName(),
+            RespondAction::getTitle() => RespondAction::getName(),
+            RefuseAction::getTitle() => RefuseAction::getName(),
+            CompleteAction::getTitle() => CompleteAction::getName(),
+            AppointAction::getTitle() => AppointAction::getName(),
         ];
-
-        /*return [
-            new CancelAction(),
-            new RespondAction(),
-            new RefuseAction(),
-            new CompleteAction(),
-            new AppointAction(),
-        ];*/
     }
 
-    // ToDo
-    // Возможность применения действия также зависит от роли...
     /**
-     * @param string $action действие
+     * @param Action $action действие
+     * @param int $user_id id пользователя
      * @return string статус в которое перейдет задача после указанного действия
      */
-    public function getNextStatus($action)
+    public function getNextStatus(Action $action, $user_id)
     {
         $nextStatus = $this->status;
 
-        switch ($action) {
-            case self::ACTION_CANCEL:
+        // Если действие не может быть выполнено текущим пользователем, то нет смысла дальше проверять.
+        if (!$action->canExecute($user_id, $this->client_id, $this->performer_id)) {
+            return $nextStatus;
+        }
+
+        switch ($action->getTitle()) {
+            case CancelAction::getTitle():
             {
                 if ($this->status == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_CANCELED;
                 }
                 break;
             }
-            case self::ACTION_REFUSE:
+            case RefuseAction::getTitle():
             {
                 if ($this->status == self::STATUS_WORKED) {
                     $nextStatus = self::STATUS_FAILED;
                 }
                 break;
             }
-            case self::ACTION_APPOINT:
+            case AppointAction::getTitle():
             {
                 if ($this->status == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_WORKED;
                 }
                 break;
             }
-            case self::ACTION_COMPLETE:
+            case CompleteAction::getTitle():
             {
                 if ($this->status == self::STATUS_WORKED) {
                     $nextStatus = self::STATUS_COMPLETED;

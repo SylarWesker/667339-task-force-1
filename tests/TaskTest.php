@@ -11,6 +11,11 @@ use TaskForce\Logic\RespondAction;
 use TaskForce\Logic\CompleteAction;
 use TaskForce\Logic\RefuseAction;
 
+// ToDo
+// В psr написано "There MUST be one use keyword per declaration." т.е на каждый использование класса отдельный use
+// т.е нельзя делать как в строке ниже? (точнее не рекомендуется). Если да, то почему?
+// use TaskForce\Logic\{CancelAction, AppointAction, RespondAction, CompleteAction, RefuseAction};
+
 final class TaskTest extends TestCase
 {
     private $className = Task::class;
@@ -40,7 +45,7 @@ final class TaskTest extends TestCase
 
     public function testGetNextStatusWithStatusWorked()
     {
-        // Т.к следующий статус зависит и от дейтсвия и от текущего статуса, то нужен способ задать статус.
+        // Т.к следующий статус зависит и от действия и от текущего статуса, то нужен способ задать статус.
         // Пока не реализована смена статусов. Поэтому приходится менять через рефлексию.
         $reflector = new ReflectionClass($this->className);
         $property = $reflector->getProperty('status');
