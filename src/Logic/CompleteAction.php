@@ -8,7 +8,7 @@ class CompleteAction extends Action
 
     public static function getName()
     {
-        return 'Выполненить';
+        return 'Выполнить';
     }
 
     public static function getTitle()
