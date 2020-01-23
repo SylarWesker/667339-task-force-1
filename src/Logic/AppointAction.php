@@ -2,7 +2,7 @@
 
 namespace TaskForce\Logic;
 
-class AppointAction
+class AppointAction extends Action
 {
     private const ACTION_NAME = 'appoint';
 
