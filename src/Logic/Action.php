@@ -4,18 +4,22 @@ namespace TaskForce\Logic;
 
 abstract class Action
 {
-    // Возвращает название действия.
-    public static abstract function getName();
+    /**
+     * @return string - Возвращает внутренее имя действия.
+     */
+    abstract public static function getName(): string;
 
-    // Возвращает внутренее имя.
-    public static abstract function getTitle();
+    /**
+     * @return string - Возвращает название действия.
+     */
+    abstract public static function getTitle(): string;
 
     /**
      * Проверка прав на выполнение действия.
-     * @param $id_user - id текущего пользователя
-     * @param $client_id - id клиента
-     * @param $performer_id - id исполнителя
-     * @return bool
+     * @param int $id_user - id текущего пользователя
+     * @param int $client_id - id клиента
+     * @param int $performer_id - id исполнителя
+     * @return bool - может ли быть выполнено действие для задачи пользователем с id = $id_user
      */
-    public static abstract function canExecute($id_user, $client_id, $performer_id);
+    abstract public static function canExecute(int $id_user, int $client_id, int $performer_id): bool;
 }
