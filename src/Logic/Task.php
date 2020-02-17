@@ -3,6 +3,7 @@
 namespace TaskForce\Logic;
 
 use DateTime;
+use TaskForce\Exception\WrongStatusException;
 
 /**
  * Class Task - класс задачи
@@ -124,9 +125,15 @@ class Task
      * @param string $status - статус задачи
      * @param int $user_id - id пользователя
      * @return array список возможных действий для указанного статуса.
+     * @throws WrongStatusException
      */
     public function getActions(string $status, int $user_id): array
     {
+        $status_list = $this->getStatusList();
+        if (!array_key_exists($status, $status_list)) {
+            throw new WrongStatusException('Не существует статуса ' . $status);
+        }
+
         switch ($status) {
             case self::STATUS_NEW:
             {
@@ -147,7 +154,7 @@ class Task
         if (!empty($actions)) {
             $actions = array_filter(
                 $actions,
-                function ($action) use ($user_id) {
+                function (Action $action) use ($user_id) {
                     return $action->canExecute($user_id, $this->client_id, $this->performer_id);
                 }
             );
