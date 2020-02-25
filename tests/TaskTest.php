@@ -10,6 +10,7 @@ use TaskForce\Logic\AppointAction;
 use TaskForce\Logic\RespondAction;
 use TaskForce\Logic\CompleteAction;
 use TaskForce\Logic\RefuseAction;
+use TaskForce\Exception\WrongStatusException;
 
 // ToDo
 // В psr написано "There MUST be one use keyword per declaration." т.е на каждый использование класса отдельный use
@@ -18,11 +19,11 @@ use TaskForce\Logic\RefuseAction;
 
 final class TaskTest extends TestCase
 {
-    private $className = Task::class;
+    private string $className = Task::class;
 
-    protected $task;
-    protected $client_id;
-    protected $performer_id;
+    protected Task $task;
+    protected int $client_id;
+    protected int $performer_id;
 
     protected function setUp(): void
     {
@@ -217,5 +218,11 @@ final class TaskTest extends TestCase
         $this->assertEquals($this->task->getActions(Task::STATUS_CANCELED, $this->performer_id), []);
         $this->assertEquals($this->task->getActions(Task::STATUS_FAILED, $this->performer_id), []);
         $this->assertEquals($this->task->getActions(Task::STATUS_COMPLETED, $this->performer_id), []);
+    }
+
+    public function testGetActionsWrongStatus()
+    {
+        $this->expectException(WrongStatusException::class);
+        $this->task->getActions('NotExistStatus', $this->client_id);
     }
 }

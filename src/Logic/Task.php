@@ -2,6 +2,9 @@
 
 namespace TaskForce\Logic;
 
+use DateTime;
+use TaskForce\Exception\WrongStatusException;
+
 /**
  * Class Task - класс задачи
  * @package TaskForce\Logic
@@ -15,41 +18,39 @@ class Task
     public const STATUS_FAILED = 'failed';
 
     /** @var int $client_id - id заказчика */
-    protected $client_id;
+    protected int $client_id;
 
     /** @var int $performer_id - id исполнителя */
-    protected $performer_id;
+    protected int $performer_id;
 
-    /** @var date $finish_date - срок завершения задачи */
-    protected $finish_date;
+    /** @var DateTime $finish_date - срок завершения задачи */
+    protected DateTime $finish_date;
 
     /** @var string $status - текущий статус задачи */
-    protected $status = self::STATUS_NEW;
+    protected string $status = self::STATUS_NEW;
 
-    // ToDo
-    // а как же дата завершения? логичнее передавать id заказчика и дату завершения, а id исполнителя потом установить когда он станет известен.
-    public function __construct($id_client, $id_performer)
+    public function __construct(int $id_client, int $id_performer)
     {
         $this->client_id = $id_client;
         $this->performer_id = $id_performer;
     }
 
-    public function getClientId()
+    public function getClientId(): int
     {
         return $this->client_id;
     }
 
-    public function getPerformerId()
+    public function getPerformerId(): int
     {
         return $this->performer_id;
     }
 
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    public function getStatusList()
+    public function getStatusList(): array
     {
         return [
             self::STATUS_NEW => 'новое',
@@ -60,14 +61,14 @@ class Task
         ];
     }
 
-    public function getActionList()
+    public function getActionList(): array
     {
         return [
-            CancelAction::getTitle() => CancelAction::getName(),
-            RespondAction::getTitle() => RespondAction::getName(),
-            RefuseAction::getTitle() => RefuseAction::getName(),
-            CompleteAction::getTitle() => CompleteAction::getName(),
-            AppointAction::getTitle() => AppointAction::getName(),
+            RespondAction::getName() => RespondAction::getTitle(),
+            RefuseAction::getName() => RefuseAction::getTitle(),
+            CancelAction::getName() => CancelAction::getTitle(),
+            CompleteAction::getName() => CompleteAction::getTitle(),
+            AppointAction::getName() => AppointAction::getTitle(),
         ];
     }
 
@@ -76,7 +77,7 @@ class Task
      * @param int $user_id id пользователя
      * @return string статус в которое перейдет задача после указанного действия
      */
-    public function getNextStatus(Action $action, $user_id)
+    public function getNextStatus(Action $action, int $user_id): string
     {
         $nextStatus = $this->status;
 
@@ -85,29 +86,29 @@ class Task
             return $nextStatus;
         }
 
-        switch ($action->getTitle()) {
-            case CancelAction::getTitle():
+        switch ($action->getName()) {
+            case CancelAction::getName():
             {
                 if ($this->status == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_CANCELED;
                 }
                 break;
             }
-            case RefuseAction::getTitle():
+            case RefuseAction::getName():
             {
                 if ($this->status == self::STATUS_WORKED) {
                     $nextStatus = self::STATUS_FAILED;
                 }
                 break;
             }
-            case AppointAction::getTitle():
+            case AppointAction::getName():
             {
                 if ($this->status == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_WORKED;
                 }
                 break;
             }
-            case CompleteAction::getTitle():
+            case CompleteAction::getName():
             {
                 if ($this->status == self::STATUS_WORKED) {
                     $nextStatus = self::STATUS_COMPLETED;
@@ -121,12 +122,18 @@ class Task
 
     /**
      * Возвращает список, возможных действий для задачи.
-     * @param $status - статус задачи
+     * @param string $status - статус задачи
      * @param int $user_id - id пользователя
      * @return array список возможных действий для указанного статуса.
+     * @throws WrongStatusException
      */
-    public function getActions($status, $user_id)
+    public function getActions(string $status, int $user_id): array
     {
+        $status_list = $this->getStatusList();
+        if (!array_key_exists($status, $status_list)) {
+            throw new WrongStatusException('Не существует статуса ' . $status);
+        }
+
         switch ($status) {
             case self::STATUS_NEW:
             {
@@ -145,9 +152,12 @@ class Task
         }
 
         if (!empty($actions)) {
-            $actions = array_filter($actions, function ($x) use ($user_id) {
-                return $x->canExecute($user_id, $this->client_id, $this->performer_id);
-            });
+            $actions = array_filter(
+                $actions,
+                function (Action $action) use ($user_id) {
+                    return $action->canExecute($user_id, $this->client_id, $this->performer_id);
+                }
+            );
         }
 
         return $actions;
