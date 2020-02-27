@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `User`
     `email`       varchar(255) UNIQUE NOT NULL,
     `password`    varchar(255)        NOT NULL,
     `full_name`   varchar(255)        NOT NULL,
+    `adding_date` date,
 
     -- геоданные
     `latitude`    decimal(8, 6),
@@ -73,8 +74,9 @@ CREATE TABLE `Profile`
 
 CREATE TABLE IF NOT EXISTS `Category`
 (
-    `id`   int PRIMARY KEY AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL
+    `id`        int PRIMARY KEY AUTO_INCREMENT,
+    `name`      varchar(255) NOT NULL,
+    `icon_name` varchar(255) NOT NULL -- название иконки (добавил потому что есть такое поле в файле categories.csv).
 );
 
 -- Специализации исполнителя
