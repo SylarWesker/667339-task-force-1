@@ -3,6 +3,7 @@
 namespace TaskForce\Utils;
 
 use SplFileObject;
+use TaskForce\Exception\FileException;
 
 // Общий план.
 // 1. Открыть и прочитать csv файл.
@@ -24,7 +25,11 @@ use SplFileObject;
 // Класс построитель связей.
 // Содержит карту связей, также имеет данные для их построения.
 
-class CsvToSqlFileConverter
+/**
+ * Class CSVFileReader - предназначен для чтения данных из csv файла.
+ * @package TaskForce\Utils
+ */
+class CSVFileReader
 {
     /**
      * @var string - путь к файлу.
@@ -32,42 +37,51 @@ class CsvToSqlFileConverter
     private string $filePath;
 
     /**
-     * @var bool - является ли первая строка в файле заголовком колонок?
+     * @var bool - содердит ли первая строка в файле заголовки колонок.
      */
     private bool $firstRowHeader;
 
     /**
-     * @var SplFileObject
+     * @var bool - вернуть данные в виде ассоциативного массива (ключ - название колонки).
      */
-    private ?SplFileObject $fileReader;
+    private bool $getAssocData;
 
     /**
-     * @var array - данные прочитанные из файла.
+     * @var SplFileObject - используется для чтения csv файла.
      */
-    private array $fileData;
+    private ?SplFileObject $fileReader;
 
     /**
      * CsvToSqlFileConverter constructor.
      * @param string $filePath - путь к файлу.
      * @param bool $firstRowHeader - является ли первая строка заголовком данных.
+     * @param bool $getAssocData - будет ли возвращаемый массив с данными ассоциативным (ключ - название колонки).
      */
-    public function __construct(string $filePath, bool $firstRowHeader = false)
+    public function __construct(string $filePath, bool $firstRowHeader = false, bool $getAssocData = false)
     {
         $this->filePath = $filePath;
         $this->firstRowHeader = $firstRowHeader;
+        $this->getAssocData = $getAssocData;
     }
 
     public function readData(): array
     {
         if (!file_exists($this->filePath)) {
-            throw new \Exception("Файл не существует");
+            throw new FileException("Файл не существует.");
         }
 
-        $this->fileReader = new SplFileObject($this->filePath, 'r');
+        try {
+            $this->fileReader = new SplFileObject($this->filePath, 'r');
+        } catch (\RuntimeException $run_exc) {
+            throw new FileException("Не получилось открыть файл для чтения.");
+        } catch (\LogicException $logic_exc) {
+            throw new FileException("Указанный путь является директорией, а не файлом.");
+        }
+
         $this->fileReader->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY);
 
         $header = $this->getHeader();
-        $data = $this->getData();
+        $data = $this->getData($header);
 
         $this->fileReader = null;
 
@@ -86,12 +100,23 @@ class CsvToSqlFileConverter
         return $line;
     }
 
-    private function getData(): ?array
+    private function getData($header): ?array
     {
         $data = null;
 
         foreach ($this->getNextLine() as $line) {
             if ($line) {
+                if ($this->getAssocData) {
+                    $newLine = [];
+
+                    foreach ($line as $key => $value) {
+                        $columnName = $header[$key];
+                        $newLine[$columnName] = $value;
+                    }
+
+                    $line = $newLine;
+                }
+
                 $data[] = $line;
             }
         }
@@ -101,7 +126,6 @@ class CsvToSqlFileConverter
 
     private function getNextLine(): ?iterable
     {
-        $line = null;
         while (!$this->fileReader->eof()) {
             $line = $this->fileReader->fgetcsv();
             yield $line;
