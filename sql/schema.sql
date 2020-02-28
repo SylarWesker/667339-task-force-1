@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS `Task`
     `creation_date` datetime,
 
     -- геоданные
-    `latitude`      decimal(8, 6),
-    `longitude`     decimal(8, 6),
+    `latitude`      decimal(9, 7),
+    `longitude`     decimal(9, 7),
     `locality_id`   int
 );
 
@@ -48,8 +48,8 @@ CREATE TABLE IF NOT EXISTS `User`
     `adding_date` date,
 
     -- геоданные
-    `latitude`    decimal(8, 6),
-    `longitude`   decimal(8, 6),
+    `latitude`    decimal(9, 7), -- это тут теперь не нужно? (потому что есть в геоданных населенного пункта)
+    `longitude`   decimal(9, 7), -- это тут теперь не нужно? (потому что есть в геоданных населенного пункта)
     `locality_id` int
 );
 
@@ -98,8 +98,10 @@ CREATE TABLE IF NOT EXISTS `UserPortfolio`
 -- Населенный пункт
 CREATE TABLE IF NOT EXISTS `Locality`
 (
-    `id`   int PRIMARY KEY AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL
+    `id`        int PRIMARY KEY AUTO_INCREMENT,
+    `name`      varchar(255) NOT NULL,
+    `latitude`  decimal(9, 7),
+    `longitude` decimal(9, 7)
 );
 
 -- Отклик
