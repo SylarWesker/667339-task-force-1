@@ -8,9 +8,9 @@ namespace TaskForce\Utils;
  */
 class Csv2SqlConverter
 {
-    public const COLUMN_DATA_TYPE = 'DATA_TYPE';
+    public const COLUMN_DATE_TYPE = 'DATE_TYPE';
     public const COLUMN_STRING_TYPE = 'STRING_TYPE';
-
+    public const COLUMN_NUMBER_TYPE = 'NUMBER_TYPE'; // заменить на OTHER_TYPE? тип нужен чтобы понимать оборачивать ли в кавычки значения.
 
     /**
      * @var string - название таблицы куда будут добавлять данные.
@@ -41,6 +41,7 @@ class Csv2SqlConverter
         }
 
         // Валидация.
+        // 1. Проверить есть ли в данных файла все необходимые колонки!
         // ???
 
         // ToDo
@@ -58,21 +59,19 @@ class Csv2SqlConverter
 
         $valuesToInsert = [];
         foreach ($dataFromFile['data'] as $row) {
-            $insertParams = range(0, count($columnNamesInTable) - 1); //$templateForInsert;
+            $insertParams = range(0, count($columnNamesInTable) - 1);
 
             foreach ($this->columnsData as $data) {
-                $columnNameTable = $data['columnNameTable'];
-
                 if (array_key_exists('columnNameFile', $data)) {
-                    $columnNameFile = $data['columnNameFile'];
+                    $columnName = $data['columnNameFile'];
                 } else {
-                    $columnNameFile = $columnNameTable;
+                    $columnName = $data['columnNameTable'];
                 }
 
-                $insertValue = $row[$columnNameFile];
+                $insertValue = $row[$columnName];
 
                 switch ($data['columnType']) {
-                    case Csv2SqlConverter::COLUMN_DATA_TYPE:
+                    case Csv2SqlConverter::COLUMN_DATE_TYPE:
                     {
                         $insertValue = "'" . $insertValue . "'";
                         break;
@@ -86,7 +85,7 @@ class Csv2SqlConverter
                     }
                 }
 
-                $index = $columnNamesInTable[$columnNameTable];
+                $index = $columnNamesInTable[$data['columnNameTable']];
                 $insertParams[$index] = $insertValue;
             }
 
@@ -94,8 +93,7 @@ class Csv2SqlConverter
             $valuesToInsert[] = "($insertTemplate)";
         }
 
-
-        $valuesToInsertStr = join(',', $valuesToInsert);
+        $valuesToInsertStr = join(',' . PHP_EOL, $valuesToInsert);
         $sql .= $valuesToInsertStr . ";";
 
         return $sql;
