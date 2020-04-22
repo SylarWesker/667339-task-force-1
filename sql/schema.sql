@@ -110,17 +110,18 @@ CREATE TABLE IF NOT EXISTS `locality`
 CREATE TABLE IF NOT EXISTS `response`
 (
     `id`            int PRIMARY KEY AUTO_INCREMENT,
-    `add_data`      date, -- Дата добавления записи.
-    `candidate_id`  int, -- id претендента на выполнение задания
-    `task_id`       int,
-    `offered_price` int
+    `add_date`      date, -- Дата добавления записи.
+    `candidate_id`  int NOT NULL, -- id претендента на выполнение задания
+    `task_id`       int NOT NULL,
+    `offered_price` int,
+    `comment`       varchar(255)
 );
 
 -- Отзыв
 CREATE TABLE IF NOT EXISTS `review`
 (
     `id`      int PRIMARY KEY AUTO_INCREMENT,
-    `add_data`      date, -- Дата добавления записи.
+    `add_date`      date, -- Дата добавления записи.
     `task_id` int NOT NULL,
     `rate`    int,
     `comment` varchar(255)
@@ -153,7 +154,7 @@ ALTER TABLE `task`
 ALTER TABLE `task`
     ADD FOREIGN KEY (`status_id`) REFERENCES `task_status` (`id`);
 ALTER TABLE `task`
-    ADD FOREIGN KEY (`locality_id`) REFERENCES `Locality` (`id`);
+    ADD FOREIGN KEY (`locality_id`) REFERENCES `locality` (`id`);
 
 ALTER TABLE `review`
     ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
