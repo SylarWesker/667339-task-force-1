@@ -5,31 +5,12 @@ namespace TaskForce\Utils;
 use SplFileObject;
 use TaskForce\Exception\FileException;
 
-// Общий план.
-// 1. Открыть и прочитать csv файл.
-// 2. Конвертировать данные из файла в sql скрипт (учитывая структуру таблицы).
-// 3. После прочтения и формирования всех файлов нужно создать взаимосвязи между загружаеммыми данными.
-
-// Важен порядок загрузки файлов (понять и записать порядок).
-// Разобраться с классами для загрузки. сколько, кто за что отвечает.
-// решить в лоб. потом попробовать решить красиво.
-
-// Классы.
-//
-// Класс преобразования в sql код.
-// нужны: данные из csv файла, имя таблицы, карта отображения на колонки таблицы
-//
-// Класс определяющий порядок чтения и формирования sql файлов.
-// знает порядок формирования файлов, опционально может строить связи (также знает о связях).
-//
-// Класс построитель связей.
-// Содержит карту связей, также имеет данные для их построения.
-
 /**
  * Class CSVFileReader - предназначен для чтения данных из csv файла.
+ *
  * @package TaskForce\Utils
  */
-class CSVFileReader
+class CsvFileReader
 {
     /**
      * @var string - путь к файлу.
@@ -53,6 +34,7 @@ class CSVFileReader
 
     /**
      * CsvToSqlFileConverter constructor.
+     *
      * @param string $filePath - путь к файлу.
      * @param bool $firstRowHeader - является ли первая строка заголовком данных.
      * @param bool $getAssocData - будет ли возвращаемый массив с данными ассоциативным (ключ - название колонки).
@@ -61,9 +43,20 @@ class CSVFileReader
     {
         $this->filePath = $filePath;
         $this->firstRowHeader = $firstRowHeader;
-        $this->getAssocData = $getAssocData;
+
+        if ($this->firstRowHeader) {
+            $this->getAssocData = $getAssocData;
+        } else {
+            $this->getAssocData = false;
+        }
     }
 
+    /**
+     * Метод чтения данных из CSV файла.
+     *
+     * @return array - ассоциативный массив (по ключу 'header' содержаться заголовки данных, по ключу 'data' - сами данные).
+     * @throws FileException
+     */
     public function readData(): array
     {
         if (!file_exists($this->filePath)) {
