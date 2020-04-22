@@ -15,6 +15,11 @@ class SqlFileWriter
      */
     public static function save(string $sql, string $filePath)
     {
+        $file_directory = dirname($filePath);
+        if(!is_dir($file_directory)) {
+            mkdir($file_directory);
+        }
+
         $fileWriter = new \SplFileObject($filePath, 'w');
         $writeResult = $fileWriter->fwrite($sql);
         $fileWriter = null;
