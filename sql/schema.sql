@@ -1,22 +1,23 @@
 -- Создание БД.
-CREATE DATABASE IF NOT EXISTS TaskForce
+CREATE DATABASE IF NOT EXISTS taskForce
     DEFAULT CHARACTER SET utf8
     DEFAULT COLLATE utf8_general_ci;
 
-use TaskForce;
+use taskForce;
 
-CREATE TABLE IF NOT EXISTS `Task`
+CREATE TABLE IF NOT EXISTS `task`
 (
     `id`            int PRIMARY KEY AUTO_INCREMENT,
     `client_id`     int          NOT NULL,
     `performer_id`  int,
-    `finish_date`   datetime,
     `status_id`     int,
     `category_id`   int          NOT NULL,
     `description`   varchar(255) NOT NULL,
     `details`       text         NOT NULL,
-    `cost`          int, -- бюджет задачи
+    `budget`        int,
     `creation_date` datetime,
+    `finish_date`   datetime,
+    `address`       varchar(255), -- на сайте не вижу (есть в файле с данными. ну пускай будет. тут улица, дом и квартира походу).
 
     -- геоданные
     `latitude`      decimal(9, 7),
@@ -24,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `Task`
     `locality_id`   int
 );
 
-CREATE TABLE IF NOT EXISTS `TaskStatus`
+CREATE TABLE IF NOT EXISTS `task_status`
 (
     `id`         int PRIMARY KEY AUTO_INCREMENT,
     `name`       varchar(255) UNIQUE NOT NULL,
@@ -32,20 +33,20 @@ CREATE TABLE IF NOT EXISTS `TaskStatus`
     `image_path` varchar(255)
 );
 
-CREATE TABLE IF NOT EXISTS `TaskRelatedFile`
+CREATE TABLE IF NOT EXISTS `task_related_file`
 (
     `id`       int PRIMARY KEY AUTO_INCREMENT,
     `task_id`  int          NOT NULL,
     `filepath` varchar(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS `User`
+CREATE TABLE IF NOT EXISTS `user`
 (
     `id`          int PRIMARY KEY AUTO_INCREMENT,
     `email`       varchar(255) UNIQUE NOT NULL,
     `password`    varchar(255)        NOT NULL,
     `full_name`   varchar(255)        NOT NULL,
-    `adding_date` date,
+    `add_data`    date, -- Дата добавления записи в таблицу.
 
     -- геоданные
     `latitude`    decimal(9, 7), -- это тут теперь не нужно? (потому что есть в геоданных населенного пункта)
@@ -53,11 +54,12 @@ CREATE TABLE IF NOT EXISTS `User`
     `locality_id` int
 );
 
-CREATE TABLE `Profile`
+CREATE TABLE `profile`
 (
     `id`                           int PRIMARY KEY AUTO_INCREMENT,
     `user_id`                      int,
     `avatar_filepath`              varchar(255),
+    `address`                      varchar(255), -- на сайте не вижу (есть в файле с данными. ну пускай будет. тут улица, дом и квартира походу).
     `birthday`                     date,
     `about`                        varchar(255),
     `phone`                        varchar(255),
@@ -72,7 +74,7 @@ CREATE TABLE `Profile`
     `hide_profile`                 bool
 );
 
-CREATE TABLE IF NOT EXISTS `Category`
+CREATE TABLE IF NOT EXISTS `category`
 (
     `id`        int PRIMARY KEY AUTO_INCREMENT,
     `name`      varchar(255) NOT NULL,
@@ -80,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `Category`
 );
 
 -- Специализации исполнителя
-CREATE TABLE IF NOT EXISTS `UserSpecialization`
+CREATE TABLE IF NOT EXISTS `user_specialization`
 (
     `id`          int PRIMARY KEY AUTO_INCREMENT,
     `user_id`     int NOT NULL,
@@ -88,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `UserSpecialization`
 );
 
 -- Фото работ исполнителя
-CREATE TABLE IF NOT EXISTS `UserPortfolio`
+CREATE TABLE IF NOT EXISTS `user_portfolio`
 (
     `id`       int PRIMARY KEY AUTO_INCREMENT,
     `user_id`  int NOT NULL,
@@ -96,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `UserPortfolio`
 );
 
 -- Населенный пункт
-CREATE TABLE IF NOT EXISTS `Locality`
+CREATE TABLE IF NOT EXISTS `locality`
 (
     `id`        int PRIMARY KEY AUTO_INCREMENT,
     `name`      varchar(255) NOT NULL,
@@ -105,24 +107,26 @@ CREATE TABLE IF NOT EXISTS `Locality`
 );
 
 -- Отклик
-CREATE TABLE IF NOT EXISTS `Response`
+CREATE TABLE IF NOT EXISTS `response`
 (
     `id`            int PRIMARY KEY AUTO_INCREMENT,
+    `add_data`      date, -- Дата добавления записи.
     `candidate_id`  int, -- id претендента на выполнение задания
     `task_id`       int,
     `offered_price` int
 );
 
 -- Отзыв
-CREATE TABLE IF NOT EXISTS `Review`
+CREATE TABLE IF NOT EXISTS `review`
 (
     `id`      int PRIMARY KEY AUTO_INCREMENT,
+    `add_data`      date, -- Дата добавления записи.
     `task_id` int NOT NULL,
     `rate`    int,
     `comment` varchar(255)
 );
 
-CREATE TABLE IF NOT EXISTS `Message`
+CREATE TABLE IF NOT EXISTS `message`
 (
     `id`          int PRIMARY KEY AUTO_INCREMENT,
     `sender_id`   int NOT NULL,
@@ -132,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `Message`
 );
 
 -- Избранные исполнители
-CREATE TABLE `FavoritePerformer`
+CREATE TABLE `favorite_performer`
 (
     `id`           int PRIMARY KEY AUTO_INCREMENT,
     `client_id`    int NOT NULL,
@@ -140,60 +144,60 @@ CREATE TABLE `FavoritePerformer`
 );
 
 -- Добавление внешних ключей.
-ALTER TABLE `Task`
-    ADD FOREIGN KEY (`client_id`) REFERENCES `User` (`id`);
-ALTER TABLE `Task`
-    ADD FOREIGN KEY (`performer_id`) REFERENCES `User` (`id`);
-ALTER TABLE `Task`
-    ADD FOREIGN KEY (`category_id`) REFERENCES `Category` (`id`);
-ALTER TABLE `Task`
-    ADD FOREIGN KEY (`status_id`) REFERENCES `TaskStatus` (`id`);
-ALTER TABLE `Task`
+ALTER TABLE `task`
+    ADD FOREIGN KEY (`client_id`) REFERENCES `user` (`id`);
+ALTER TABLE `task`
+    ADD FOREIGN KEY (`performer_id`) REFERENCES `user` (`id`);
+ALTER TABLE `task`
+    ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`);
+ALTER TABLE `task`
+    ADD FOREIGN KEY (`status_id`) REFERENCES `task_status` (`id`);
+ALTER TABLE `task`
     ADD FOREIGN KEY (`locality_id`) REFERENCES `Locality` (`id`);
 
-ALTER TABLE `Review`
-    ADD FOREIGN KEY (`task_id`) REFERENCES `Task` (`id`);
+ALTER TABLE `review`
+    ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
 
-ALTER TABLE `TaskRelatedFile`
-    ADD FOREIGN KEY (`task_id`) REFERENCES `Task` (`id`);
+ALTER TABLE `task_related_file`
+    ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
 
-ALTER TABLE `UserSpecialization`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `User` (`id`);
-ALTER TABLE `UserSpecialization`
-    ADD FOREIGN KEY (`category_id`) REFERENCES `Category` (`id`);
+ALTER TABLE `user_specialization`
+    ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+ALTER TABLE `user_specialization`
+    ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`);
 
-ALTER TABLE `User`
-    ADD FOREIGN KEY (`locality_id`) REFERENCES `Locality` (`id`);
+ALTER TABLE `user`
+    ADD FOREIGN KEY (`locality_id`) REFERENCES `locality` (`id`);
 
-ALTER TABLE `Profile`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `User` (`id`);
+ALTER TABLE `profile`
+    ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `UserPortfolio`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `User` (`id`);
+ALTER TABLE `user_portfolio`
+    ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `Response`
-    ADD FOREIGN KEY (`candidate_id`) REFERENCES `User` (`id`);
-ALTER TABLE `Response`
-    ADD FOREIGN KEY (`task_id`) REFERENCES `Task` (`id`);
-ALTER TABLE `Response`
+ALTER TABLE `response`
+    ADD FOREIGN KEY (`candidate_id`) REFERENCES `user` (`id`);
+ALTER TABLE `response`
+    ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
+ALTER TABLE `response`
     ADD CONSTRAINT unique_response_on_task UNIQUE KEY (`task_id`, `candidate_id`);
 
+ALTER TABLE `message`
+    ADD FOREIGN KEY (`sender_id`) REFERENCES `user` (`id`);
 ALTER TABLE `Message`
-    ADD FOREIGN KEY (`sender_id`) REFERENCES `User` (`id`);
+    ADD FOREIGN KEY (`receiver_id`) REFERENCES `user` (`id`);
 ALTER TABLE `Message`
-    ADD FOREIGN KEY (`receiver_id`) REFERENCES `User` (`id`);
-ALTER TABLE `Message`
-    ADD FOREIGN KEY (`task_id`) REFERENCES `Task` (`id`);
+    ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
 
-ALTER TABLE `FavoritePerformer`
-    ADD FOREIGN KEY (`client_id`) REFERENCES `User` (`id`);
-ALTER TABLE `FavoritePerformer`
-    ADD FOREIGN KEY (`performer_id`) REFERENCES `User` (`id`);
+ALTER TABLE `favorite_performer`
+    ADD FOREIGN KEY (`client_id`) REFERENCES `user` (`id`);
+ALTER TABLE `favorite_performer`
+    ADD FOREIGN KEY (`performer_id`) REFERENCES `user` (`id`);
 
 -- ToDo
 -- На будущее
 -- Заполнение таблиц статусов заданий.
-/*INSERT INTO `TaskStatus` (`id`, `name`, `text`)
+/*INSERT INTO `taskStatus` (`id`, `name`, `text`)
 VALUES
     (1, 'new', 'Новае'),
     (2, 'canceled', 'Отменено'),
