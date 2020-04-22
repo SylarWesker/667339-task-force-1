@@ -34,11 +34,12 @@ class SqlConverter
      *
      * @param array $data - данные.
      * @param array $header - заголовки данных.
+     * @param array $relationData
      *
      * @return string|null - sql код вставки данных в БД.
      * @throws \Exception
      */
-    public function convert(array $data, array $header): ?string
+    public function convert(array $data, array $header, array $relationData = null): ?string
     {
         // Валидация.
         $validateResult = $this->validate($header, $data);
@@ -47,7 +48,7 @@ class SqlConverter
         }
 
         // Преобразование в sql.
-        $sql = $this->convertDataToSql($data);
+        $sql = $this->convertDataToSql($data, $relationData);
         return $sql;
     }
 
@@ -59,7 +60,7 @@ class SqlConverter
      *
      * @return bool - результат проверки.
      */
-    private function validate($header, $data): bool
+    private function validate(array $header, array $data): bool
     {
         $result = true;
 
@@ -79,11 +80,13 @@ class SqlConverter
     }
 
     /**
-     * @param $data - двумерный массив с данными, которые нужно добавить в БД.
-     * @return string|null - sql запрос с командой INSERT и данными из $data.
      *
+     * @param $data - двумерный массив с данными, которые нужно добавить в БД.
+     * @param $relationData
+     *
+     * @return string|null - sql запрос с командой INSERT и данными из $data.
      */
-    private function convertDataToSql($data): ?string
+    private function convertDataToSql(array $data, array $relationData = null): ?string
     {
         // $columnNamesInTable нужно для подстановки данных из файла в правильные позиции в sql запросе.
         $columnNamesInTable = []; // ключ - имя колонки в таблице, значение - индекс параметра в sql запросе.
@@ -93,8 +96,15 @@ class SqlConverter
         }
         $columnNamesStr = join(',', array_keys($columnNamesInTable));
 
+        // Имена колонок внешних ключей.
+        if(!empty($relationData)) {
+            $relationColumns = array_keys($relationData);
+            $columnNamesStr .= ',' . join(',', $relationColumns);
+        }
+
         $sql = "INSERT INTO $this->tableName($columnNamesStr) VALUES ";
 
+        $rowIndex = 0;
         $valuesToInsert = [];
         foreach ($data as $row) { // цикл по строкам из файла.
             $insertParams = range(0, count($columnNamesInTable) - 1);
@@ -117,7 +127,7 @@ class SqlConverter
                     }
                     case SqlConverter::COLUMN_STRING_TYPE:
                     {
-                        $insertValue = "'" . addcslashes($insertValue) . "'";
+                        $insertValue = "'" . addslashes ($insertValue) . "'";
                         break;
                     }
                 }
@@ -125,6 +135,14 @@ class SqlConverter
                 $index = $columnNamesInTable[$columnData['columnNameTable']];
                 $insertParams[$index] = $insertValue;
             }
+
+            // данные внешних ключей.
+            if(!empty($relationData)) {
+                foreach ($relationData as $relationColumnData) {
+                    $insertParams[] = $relationColumnData[$rowIndex];
+                }
+            }
+            $rowIndex++;
 
             $insertTemplate = join(',', $insertParams);
             $valuesToInsert[] = "($insertTemplate)";
