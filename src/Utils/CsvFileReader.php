@@ -18,7 +18,7 @@ class CsvFileReader
     private string $filePath;
 
     /**
-     * @var bool - содердит ли первая строка в файле заголовки колонок.
+     * @var bool - содержит ли первая строка в файле заголовки колонок.
      */
     private bool $firstRowHeader;
 
