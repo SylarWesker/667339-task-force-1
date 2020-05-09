@@ -1,10 +1,46 @@
-.DS_Store
+# yii console commands
+/yii
+/yii_test
+/yii_test.bat
+
+# phpstorm project files
 .idea
-*.ai
-*.log
-*.pdf
-*.psd
-*.sublime*
+
+# netbeans project files
+nbproject
+
+# zend studio for eclipse project files
+.buildpath
+.project
+.settings
+
+# windows thumbnail cache
 Thumbs.db
-vendor
-sql_test_data
+
+# composer vendor dir
+/vendor
+
+# composer itself is not needed
+composer.phar
+
+# Mac DS_Store Files
+.DS_Store
+
+# phpunit itself is not needed
+phpunit.phar
+# local phpunit config
+/phpunit.xml
+
+# vagrant runtime
+/.vagrant
+
+# ignore generated files
+/frontend/web/index.php
+/frontend/web/index-test.php
+/frontend/web/robots.txt
+/backend/web/index.php
+/backend/web/index-test.php
+/backend/web/robots.txt
+
+#Папка для сгенерированных sql файлов
+/sql_test_data
