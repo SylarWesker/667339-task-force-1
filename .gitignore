@@ -44,3 +44,7 @@ phpunit.phar
 
 #Папка для сгенерированных sql файлов
 /sql_test_data
+
+#runtime
+/frontend/runtime
+/backend/runtime
