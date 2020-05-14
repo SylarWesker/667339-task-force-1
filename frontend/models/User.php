@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "user".
  *
@@ -17,14 +15,9 @@ use Yii;
  * @property int|null $locality_id
  *
  * @property FavoritePerformer[] $favoritePerformers
- * @property FavoritePerformer[] $favoritePerformers0
- * @property Message[] $messages
- * @property Message[] $messages0
  * @property Profile[] $profiles
- * @property Response[] $responses
- * @property Task[] $tasks
- * @property Task[] $tasks0
- * @property Task[] $tasks1
+ * @property Task[] $tasksAsCreator
+ * @property Task[] $tasksAsPerformer
  * @property Locality $locality
  * @property UserPortfolio[] $userPortfolios
  * @property UserSpecialization[] $userSpecializations
@@ -83,36 +76,6 @@ class User extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[FavoritePerformers0]].
-     *
-     * @return \yii\db\ActiveQuery|FavoritePerformerQuery
-     */
-    public function getFavoritePerformers0()
-    {
-        return $this->hasMany(FavoritePerformer::className(), ['performer_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Messages]].
-     *
-     * @return \yii\db\ActiveQuery|MessageQuery
-     */
-    public function getMessages()
-    {
-        return $this->hasMany(Message::className(), ['sender_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Messages0]].
-     *
-     * @return \yii\db\ActiveQuery|MessageQuery
-     */
-    public function getMessages0()
-    {
-        return $this->hasMany(Message::className(), ['receiver_id' => 'id']);
-    }
-
-    /**
      * Gets query for [[Profiles]].
      *
      * @return \yii\db\ActiveQuery|ProfileQuery
@@ -123,13 +86,13 @@ class User extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Responses]].
+     * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery|ResponseQuery
+     * @return \yii\db\ActiveQuery|TaskQuery
      */
-    public function getResponses()
+    public function getTasksAsPerformer()
     {
-        return $this->hasMany(Response::className(), ['candidate_id' => 'id']);
+        return $this->hasMany(Task::className(), ['performer_id' => 'id']);
     }
 
     /**
@@ -137,29 +100,9 @@ class User extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|TaskQuery
      */
-    public function getTasks()
-    {
-        return $this->hasMany(Task::className(), ['id' => 'task_id'])->viaTable('response', ['candidate_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Tasks0]].
-     *
-     * @return \yii\db\ActiveQuery|TaskQuery
-     */
-    public function getTasks0()
+    public function getTasksAsCreator()
     {
         return $this->hasMany(Task::className(), ['client_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Tasks1]].
-     *
-     * @return \yii\db\ActiveQuery|TaskQuery
-     */
-    public function getTasks1()
-    {
-        return $this->hasMany(Task::className(), ['performer_id' => 'id']);
     }
 
     /**
