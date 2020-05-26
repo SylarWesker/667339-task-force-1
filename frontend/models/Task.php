@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "task".
  *
@@ -184,14 +182,5 @@ class Task extends \yii\db\ActiveRecord
     public function getTaskRelatedFiles()
     {
         return $this->hasMany(TaskRelatedFile::className(), ['task_id' => 'id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return TaskQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new TaskQuery(get_called_class());
     }
 }

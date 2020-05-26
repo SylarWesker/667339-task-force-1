@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "favorite_performer".
  *
@@ -67,14 +65,5 @@ class FavoritePerformer extends \yii\db\ActiveRecord
     public function getPerformer()
     {
         return $this->hasOne(User::className(), ['id' => 'performer_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return FavoritePerformerQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new FavoritePerformerQuery(get_called_class());
     }
 }

@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "locality".
  *
@@ -68,14 +66,5 @@ class Locality extends \yii\db\ActiveRecord
     public function getUsers()
     {
         return $this->hasMany(User::className(), ['locality_id' => 'id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return LocalityQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new LocalityQuery(get_called_class());
     }
 }

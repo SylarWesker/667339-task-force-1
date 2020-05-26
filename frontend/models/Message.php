@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "message".
  *
@@ -84,14 +82,5 @@ class Message extends \yii\db\ActiveRecord
     public function getTask()
     {
         return $this->hasOne(Task::className(), ['id' => 'task_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return MessageQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new MessageQuery(get_called_class());
     }
 }

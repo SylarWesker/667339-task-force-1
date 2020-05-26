@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "category".
  *
@@ -65,14 +63,5 @@ class Category extends \yii\db\ActiveRecord
     public function getUserSpecializations()
     {
         return $this->hasMany(UserSpecialization::className(), ['category_id' => 'id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return CategoryQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new CategoryQuery(get_called_class());
     }
 }

@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "review".
  *
@@ -61,14 +59,5 @@ class Review extends \yii\db\ActiveRecord
     public function getTask()
     {
         return $this->hasOne(Task::className(), ['id' => 'task_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return ReviewQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new ReviewQuery(get_called_class());
     }
 }

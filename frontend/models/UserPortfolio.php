@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "user_portfolio".
  *
@@ -56,14 +54,5 @@ class UserPortfolio extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return UserPortfolioQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new UserPortfolioQuery(get_called_class());
     }
 }

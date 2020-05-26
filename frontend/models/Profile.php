@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "profile".
  *
@@ -82,14 +80,5 @@ class Profile extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return ProfileQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new ProfileQuery(get_called_class());
     }
 }

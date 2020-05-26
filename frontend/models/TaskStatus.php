@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Yii;
-
 /**
  * This is the model class for table "task_status".
  *
@@ -57,14 +55,5 @@ class TaskStatus extends \yii\db\ActiveRecord
     public function getTasks()
     {
         return $this->hasMany(Task::className(), ['status_id' => 'id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return TaskStatusQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new TaskStatusQuery(get_called_class());
     }
 }
