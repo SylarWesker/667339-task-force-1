@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\models\form;
+namespace frontend\models\query;
 
 /**
  * This is the ActiveQuery class for [[User]].
