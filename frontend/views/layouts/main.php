@@ -3,12 +3,8 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
 use frontend\assets\AppAsset;
-use common\widgets\Alert;
+use yii\helpers\Html;
 
 AppAsset::register($this);
 ?>
@@ -125,7 +121,7 @@ AppAsset::register($this);
     </header>
     <main class="page-main">
         <div class="main-container page-container">
-            <? $content ?>
+            <?= $content ?>
         </div>
     </main>
     <footer class="page-footer">
