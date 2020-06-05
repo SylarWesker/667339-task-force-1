@@ -17,7 +17,7 @@ use frontend\models\query\UserQuery;
  * @property int|null $locality_id
  *
  * @property FavoritePerformer[] $favoritePerformers
- * @property Profile[] $profiles
+ * @property Profile $profile
  * @property Task[] $tasksAsCreator
  * @property Task[] $tasksAsPerformer
  * @property Locality $locality
@@ -26,6 +26,15 @@ use frontend\models\query\UserQuery;
  */
 class User extends \yii\db\ActiveRecord
 {
+    // ToDo!!!
+    // Модель же раздует от дополнительных полей!!! Как с этим быть???
+//     private $rating; // средний рейтинг
+//     private $reviewsCount; // кол-во отзывов
+     // public $tasksAsPerformerCount = 0; // кол-во заданий, которые выполняет в качестве исполнителя.
+
+    public $rating;
+    public $reviewsCount;
+
     /**
      * {@inheritdoc}
      */
@@ -70,7 +79,7 @@ class User extends \yii\db\ActiveRecord
     /**
      * Gets query for [[FavoritePerformers]].
      *
-     * @return \yii\db\ActiveQuery|FavoritePerformerQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getFavoritePerformers()
     {
@@ -80,11 +89,11 @@ class User extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Profiles]].
      *
-     * @return \yii\db\ActiveQuery|ProfileQuery
+     * @return \yii\db\ActiveQuery
      */
-    public function getProfiles()
+    public function getProfile()
     {
-        return $this->hasMany(Profile::className(), ['user_id' => 'id']);
+        return $this->hasOne(Profile::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -110,7 +119,7 @@ class User extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Locality]].
      *
-     * @return \yii\db\ActiveQuery|LocalityQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getLocality()
     {
@@ -120,7 +129,7 @@ class User extends \yii\db\ActiveRecord
     /**
      * Gets query for [[UserPortfolios]].
      *
-     * @return \yii\db\ActiveQuery|UserPortfolioQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getUserPortfolios()
     {
@@ -130,7 +139,7 @@ class User extends \yii\db\ActiveRecord
     /**
      * Gets query for [[UserSpecializations]].
      *
-     * @return \yii\db\ActiveQuery|UserSpecializationQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getUserSpecializations()
     {
@@ -145,4 +154,58 @@ class User extends \yii\db\ActiveRecord
     {
         return new UserQuery(get_called_class());
     }
+
+    /**
+     * Возвращает рейтинг пользователя (среднее арифмитическое от оценок за задания).
+     *
+     * @return float|null
+     */
+//    public function getRating()
+//    {
+//        if ($this->isNewRecord) {
+//            return null; // this avoid calling a query searching for null primary keys
+//        }
+//
+////        $rating = $this::find()->select(['rating' => 'AVG(review.rate)'])
+////                        ->leftJoin('task','task.performer_id = user.id')
+////                        ->where(['not', ['task.performer_id' => null]])
+////                        ->leftJoin('review','review.task_id = task.id')
+////                        ->groupBy('user.id')
+////                        ->scalar();
+//
+//        if ($this->rating === null) {
+//            $this->rating = $this->getTasksAsPerformer()
+//                ->leftJoin('review','review.task_id = task.id')
+//                ->average('review.rate');
+//        }
+//
+//        return $this->rating;
+//    }
+
+    /**
+     * Количество отзывов.
+     *
+     * @return int|null
+     */
+//    public function getReviewsCount()
+//    {
+//        if ($this->isNewRecord) {
+//            return null; // this avoid calling a query searching for null primary keys
+//        }
+//
+//        // $reviewsCount = $this->select(['reviewCount' => 'COUNT(review.id)'])
+//        //        $reviewsCount = $this::find()
+//        //            ->leftJoin('task','task.performer_id = user.id')
+//        //            ->where(['not', ['task.performer_id' => null]])
+//        //            ->leftJoin('review','review.task_id = task.id')
+//        //            ->count('review.id');
+//
+//        if ($this->reviewsCount === null) {
+//            $this->reviewsCount = $this->getTasksAsPerformer()
+//                ->leftJoin('review', 'review.task_id = task.id')
+//                ->count('review.id');
+//        }
+//
+//        return $this->reviewsCount;
+//    }
 }
